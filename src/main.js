@@ -3,7 +3,7 @@ import Level_1 from "./scenes/level_1.js";
 
 const config = {
   title: "UnderMines",
-  version: "0.0.1",
+  version: "0.0.2",
   type: Phaser.AUTO,
   scale: {
     parent: "aj-game",
