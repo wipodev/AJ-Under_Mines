@@ -1,9 +1,9 @@
-import Bootloader from "./Bootloader.js";
-import Level_1 from "./scenes/level_1.js";
+import Bootloader from "./src/bootloader.js";
+import GameMaster from "./src/scenes/gameMaster.js";
 
 const config = {
   title: "UnderMines",
-  version: "0.0.2",
+  version: "0.0.1",
   type: Phaser.AUTO,
   scale: {
     parent: "aj-game",
@@ -23,7 +23,7 @@ const config = {
       debug: false,
     },
   },
-  scene: [Bootloader, Level_1],
+  scene: [Bootloader, GameMaster],
 };
 
 new Phaser.Game(config);
