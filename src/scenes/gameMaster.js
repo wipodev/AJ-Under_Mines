@@ -5,14 +5,17 @@ export default class gameMaster extends Phaser.Scene {
     super("gameMaster");
   }
   create() {
-    for (let y = 0; y < 26; y++) {
+    for (let y = 10; y < 26; y++) {
       for (let x = 0; x < 44; x++) {
-        let tile = Math.round(Math.random() * 5);
-        if (tile === 0) tile = "T0";
-        if (tile === 1) tile = "T1";
-        if (tile === 2) tile = "T2";
-        if (tile === 3) tile = "T3";
-        if (tile === 4) tile = "T4";
+        let tile = Math.round(Math.random() * 3);
+        if (y === 10) {
+          tile = "H0";
+        } else {
+          if (tile === 0) tile = "T1";
+          if (tile === 1) tile = "T2";
+          if (tile === 2) tile = "T3";
+          if (tile === 3) tile = "T4";
+        }
         this.add.image(x * 45, y * 45, "atlas", tile);
       }
     }
