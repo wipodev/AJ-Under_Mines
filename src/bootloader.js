@@ -10,6 +10,7 @@ class Bootloader extends Phaser.Scene {
       this.scene.start("gameMaster");
     });
 
+    this.load.image("Sky", "img/sky.png");
     this.load.atlas("atlas", "atlas/maps.png", "atlas/maps.json");
   }
 }
