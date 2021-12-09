@@ -29,6 +29,29 @@ export default class gameMaster extends Phaser.Scene {
         this.add.image(x * 45, y * 45, "atlas", tile).setAngle(angle);
       }
     }
+
+    //----------  mapa del juego ----------------------------------
+    this.pf = this.physics.add.staticGroup();
+    for (let y = 10; y < 26; y++) {
+      for (let x = 0; x < 44; x++) {
+        let tile = Math.round(Math.random() * 3);
+        let angle = Math.round(Math.random() * 3);
+        if (y === 10) {
+          tile = "H0";
+          angle = 0;
+        } else {
+          if (tile === 0) tile = "T1";
+          if (tile === 1) tile = "T2";
+          if (tile === 2) tile = "T3";
+          if (tile === 3) tile = "T4";
+          if (angle === 0) angle = 0;
+          if (angle === 1) angle = 90;
+          if (angle === 2) angle = 180;
+          if (angle === 3) angle = 270;
+        }
+        this.pf.create(x * 45, y * 45, "atlas", tile).setAngle(angle);
+      }
+    }
   }
 
   update(time, delta) {
