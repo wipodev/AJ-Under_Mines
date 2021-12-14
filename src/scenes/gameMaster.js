@@ -3,8 +3,15 @@ import Player from "../gameObjects/player.js";
 export default class gameMaster extends Phaser.Scene {
   constructor() {
     super("gameMaster");
+    this.map = [];
+    this.skyline = 10;
+    this.size = 45;
+    this.height = 44;
+    this.width = 28;
   }
   create() {
+    this.generate();
+    console.log(this.map);
     //--------  fondo del juego  ----------------------------
     this.add.image(400, 300, "Sky");
     this.add.image(1200, 300, "Sky");
@@ -32,26 +39,9 @@ export default class gameMaster extends Phaser.Scene {
 
     //----------  mapa del juego ----------------------------------
     this.pf = this.physics.add.staticGroup();
-    for (let y = 10; y < 26; y++) {
-      for (let x = 0; x < 44; x++) {
-        let tile = Math.round(Math.random() * 3);
-        let angle = Math.round(Math.random() * 3);
-        if (y === 10) {
-          tile = "H0";
-          angle = 0;
-        } else {
-          if (tile === 0) tile = "T1";
-          if (tile === 1) tile = "T2";
-          if (tile === 2) tile = "T3";
-          if (tile === 3) tile = "T4";
-          if (angle === 0) angle = 0;
-          if (angle === 1) angle = 90;
-          if (angle === 2) angle = 180;
-          if (angle === 3) angle = 270;
-        }
-        this.pf.create(x * 45, y * 45, "atlas", tile).setAngle(angle);
-      }
-    }
+    this.map.forEach((e) => {
+      this.pf.create(e.x, e.y, "atlas", e.block).setAngle(e.angle);
+    });
   }
 
   update(time, delta) {
@@ -102,5 +92,46 @@ export default class gameMaster extends Phaser.Scene {
     return new Promise(function (resolve) {
       setTimeout(resolve, n * 1000);
     });
+  }
+
+  //------------------------------ create maps ramdon---------------
+  generate() {
+    for (let y = this.skyline; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        let c_x = x * this.size;
+        let c_y = y * this.size;
+        if (y === this.skyline) {
+          this.map.push({
+            x: c_x,
+            y: c_y,
+            block: "H0",
+            angle: 0,
+          });
+          continue;
+        }
+        let block = this.randomBlock(Math.round(Math.random() * 3));
+        let angle = this.randomAngle(Math.round(Math.random() * 3));
+        this.map.push({
+          x: c_x,
+          y: c_y,
+          block,
+          angle,
+        });
+      }
+    }
+  }
+
+  randomBlock(n) {
+    if (n === 0) return "T1";
+    if (n === 1) return "T2";
+    if (n === 2) return "T3";
+    if (n === 3) return "T4";
+  }
+
+  randomAngle(n) {
+    if (n === 0) return 0;
+    if (n === 1) return 90;
+    if (n === 2) return 180;
+    if (n === 3) return 270;
   }
 }
