@@ -4,14 +4,22 @@ export default class gameMaster extends Phaser.Scene {
   constructor() {
     super("gameMaster");
     this.map = [];
-    this.skyline = 10;
+    this.skyline = 3;
     this.size = 45;
-    this.height = 44;
+    this.height = 14;
     this.width = 28;
+
+    this.percTerra = [
+      { perc: 96, block: "0" },
+      { perc: 97, block: "1" },
+      { perc: 98, block: "2" },
+      { perc: 99, block: "3" },
+      { perc: 100, block: "4" },
+    ];
   }
   create() {
     this.generate();
-    console.log(this.map);
+    console.log(this.percTerra);
     //--------  fondo del juego  ----------------------------
     this.add.image(400, 300, "Sky");
     this.add.image(1200, 300, "Sky");
@@ -97,6 +105,7 @@ export default class gameMaster extends Phaser.Scene {
   //------------------------------ create maps ramdon---------------
   generate() {
     for (let y = this.skyline; y < this.height; y++) {
+      this.updatePercTerra(y);
       for (let x = 0; x < this.width; x++) {
         let c_x = x * this.size;
         let c_y = y * this.size;
@@ -109,7 +118,7 @@ export default class gameMaster extends Phaser.Scene {
           });
           continue;
         }
-        let block = this.randomBlock(Math.round(Math.random() * 3));
+        let block = this.randomBlock(Math.round(Math.random() * 100));
         let angle = this.randomAngle(Math.round(Math.random() * 3));
         this.map.push({
           x: c_x,
@@ -122,10 +131,11 @@ export default class gameMaster extends Phaser.Scene {
   }
 
   randomBlock(n) {
-    if (n === 0) return "T1";
-    if (n === 1) return "T2";
-    if (n === 2) return "T3";
-    if (n === 3) return "T4";
+    for (let e of this.percTerra) {
+      if (n <= e.perc) {
+        return "T" + e.block;
+      }
+    }
   }
 
   randomAngle(n) {
@@ -133,5 +143,36 @@ export default class gameMaster extends Phaser.Scene {
     if (n === 1) return 90;
     if (n === 2) return 180;
     if (n === 3) return 270;
+  }
+
+  updatePercTerra(y) {
+    let high = this.height - this.skyline;
+    let perc = Math.round(100 / high);
+    let top = Math.round(high / 5) * perc;
+    let factor = (y - this.skyline) * perc;
+    if (factor === top) {
+      this.percTerra[0].perc -= 20;
+    }
+    if (factor === top * 2) {
+      this.percTerra[0].perc -= 20;
+      this.percTerra[1].perc -= 20;
+    }
+    if (factor === top * 3) {
+      this.percTerra[0].perc -= 20;
+      this.percTerra[1].perc -= 20;
+      this.percTerra[2].perc -= 20;
+    }
+    if (factor === top * 4) {
+      this.percTerra[0].perc -= 20;
+      this.percTerra[1].perc -= 20;
+      this.percTerra[2].perc -= 20;
+      this.percTerra[3].perc -= 20;
+    }
+    if (factor === top * 5) {
+      this.percTerra[0].perc -= 20;
+      this.percTerra[1].perc -= 20;
+      this.percTerra[2].perc -= 20;
+      this.percTerra[3].perc -= 20;
+    }
   }
 }
