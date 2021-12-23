@@ -8,7 +8,14 @@ export default class gameMaster extends Phaser.Scene {
     this.size = 45;
     this.height = 14;
     this.width = 28;
+    this.perc = 100;
+    this.angle = 90;
 
+    this.percBlock = [
+      { perc: 98, block: "Tierra" },
+      { perc: 99, block: "Piedra" },
+      { perc: 100, block: "Agua" },
+    ];
     this.percTerra = [
       { perc: 96, block: "0" },
       { perc: 97, block: "1" },
@@ -16,19 +23,106 @@ export default class gameMaster extends Phaser.Scene {
       { perc: 99, block: "3" },
       { perc: 100, block: "4" },
     ];
+
+    this.figures = [
+      [
+        { x: 0, y: 0 },
+        { x: 45, y: 0 },
+        { x: 90, y: 0 },
+        { x: 45, y: 45 },
+      ],
+      [
+        { x: 0, y: 0 },
+        { x: 45, y: 0 },
+        { x: 90, y: 0 },
+        { x: 135, y: 0 },
+        { x: 180, y: 0 },
+        { x: 225, y: 0 },
+        { x: 45, y: 45 },
+        { x: 90, y: 45 },
+        { x: 135, y: 45 },
+        { x: 180, y: 45 },
+        { x: 45, y: 90 },
+        { x: 90, y: 90 },
+      ],
+      [
+        { x: 0, y: 0 },
+        { x: 45, y: 0 },
+        { x: 90, y: 0 },
+        { x: 135, y: 0 },
+        { x: 180, y: 0 },
+        { x: 225, y: 0 },
+        { x: 45, y: 45 },
+        { x: 90, y: 45 },
+        { x: 135, y: 45 },
+        { x: 180, y: 45 },
+        { x: 135, y: 90 },
+        { x: 180, y: 90 },
+      ],
+      [
+        { x: 0, y: 0 },
+        { x: 45, y: 0 },
+        { x: 90, y: 0 },
+        { x: 135, y: 0 },
+        { x: 180, y: 0 },
+        { x: 225, y: 0 },
+        { x: 270, y: 0 },
+        { x: 315, y: 0 },
+        { x: 45, y: 45 },
+        { x: 90, y: 45 },
+        { x: 135, y: 45 },
+        { x: 180, y: 45 },
+        { x: 225, y: 45 },
+        { x: 270, y: 45 },
+        { x: 90, y: 90 },
+        { x: 135, y: 90 },
+        { x: 180, y: 90 },
+        { x: 225, y: 90 },
+      ],
+      [
+        { x: 0, y: 0 },
+        { x: 45, y: 0 },
+        { x: 90, y: 0 },
+        { x: 135, y: 0 },
+        { x: 0, y: 45 },
+        { x: 45, y: 45 },
+        { x: 90, y: 45 },
+        { x: 0, y: 90 },
+        { x: 45, y: 90 },
+        { x: 90, y: 90 },
+        { x: 0, y: 135 },
+        { x: 45, y: 135 },
+        { x: 0, y: 180 },
+      ],
+      [
+        { x: 0, y: 0 },
+        { x: 45, y: 0 },
+        { x: 90, y: 0 },
+        { x: 135, y: 0 },
+        { x: 45, y: 45 },
+        { x: 90, y: 45 },
+        { x: 135, y: 45 },
+        { x: 45, y: 90 },
+        { x: 90, y: 90 },
+        { x: 135, y: 90 },
+        { x: 90, y: 135 },
+        { x: 135, y: 135 },
+        { x: 135, y: 180 },
+      ],
+    ];
   }
   create() {
     this.generate();
-    console.log(this.percTerra);
+    //console.log(this.percTerra);
     //--------  fondo del juego  ----------------------------
     this.add.image(400, 300, "Sky");
     this.add.image(1200, 300, "Sky");
     this.add.image(1600, 300, "Sky");
-    for (let y = 10; y < 26; y++) {
+    for (let y = 3; y < 26; y++) {
       for (let x = 0; x < 44; x++) {
         let tile = Math.round(Math.random() * 3);
         let angle = Math.round(Math.random() * 3);
-        if (y === 10) {
+        if (y === this.skyline) {
           tile = "H1";
           angle = 0;
         } else {
@@ -107,34 +201,51 @@ export default class gameMaster extends Phaser.Scene {
     for (let y = this.skyline; y < this.height; y++) {
       this.updatePercTerra(y);
       for (let x = 0; x < this.width; x++) {
-        let c_x = x * this.size;
-        let c_y = y * this.size;
-        if (y === this.skyline) {
+        let c_X = x * this.size;
+        let c_Y = y * this.size;
+        if (this.blockExtist(c_X, c_Y)) continue;
+        if (this.addSkyline(x, y)) continue;
+        let block = this.randomBlock(this.perc, this.percBlock);
+        let angle = this.getRandom(4, this.angle);
+        if (block !== "Agua" && block !== "Piedra") {
+          block = this.randomBlock(this.perc, this.percTerra, block);
           this.map.push({
-            x: c_x,
-            y: c_y,
-            block: "H0",
-            angle: 0,
+            x: c_X,
+            y: c_Y,
+            block,
+            angle,
           });
-          continue;
+        } else {
+          this.addFigure(c_X, c_Y, block, angle);
         }
-        let block = this.randomBlock(Math.round(Math.random() * 100));
-        let angle = this.randomAngle(Math.round(Math.random() * 3));
-        this.map.push({
-          x: c_x,
-          y: c_y,
-          block,
-          angle,
-        });
       }
     }
   }
 
-  randomBlock(n) {
-    for (let e of this.percTerra) {
-      if (n <= e.perc) {
-        return "T" + e.block;
+  getRandom(factor, angle = 1) {
+    return Math.round(Math.random() * factor) * angle;
+  }
+
+  randomBlock(num, percs, block = "") {
+    let random = this.getRandom(num);
+    for (let e of percs) {
+      if (random <= (num * e.perc) / 100) {
+        return block.substring(0, 1) + e.block;
       }
+    }
+  }
+
+  blockExtist(x, y) {
+    if (this.map.length !== 0) {
+      return this.map.some((e) => {
+        if (e.x === x && e.y === y) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+    } else {
+      return false;
     }
   }
 
@@ -174,5 +285,28 @@ export default class gameMaster extends Phaser.Scene {
       this.percTerra[2].perc -= 20;
       this.percTerra[3].perc -= 20;
     }
+  }
+
+  addSkyline(x, y) {
+    if (y === this.skyline) {
+      this.map.push({
+        x: x * this.size,
+        y: y * this.size,
+        block: "H0",
+        angle: 0,
+      });
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  addFigure(x, y, block, angle) {
+    this.figures[this.getRandom(this.figures.length - 1)].forEach((e) => {
+      if (!this.blockExtist(x + e.x, y + e.y)) {
+        block = this.randomBlock(this.perc, this.percTerra, block);
+        this.map.push({ x: x + e.x, y: y + e.y, block, angle });
+      }
+    });
   }
 }
