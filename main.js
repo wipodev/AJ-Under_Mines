@@ -3,7 +3,7 @@ import GameMaster from "./src/scenes/gameMaster.js";
 
 const config = {
   title: "UnderMines",
-  version: "0.0.1",
+  version: "0.1.1",
   type: Phaser.AUTO,
   scale: {
     parent: "aj-game",
