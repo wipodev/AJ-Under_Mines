@@ -124,6 +124,11 @@ export default class gameMaster extends Phaser.Scene {
 
     // evento de teclas
     this.cursors = this.input.keyboard.createCursorKeys();
+
+    this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+    this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+    this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+    this.keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
   }
 
   update(time, delta) {
@@ -139,6 +144,24 @@ export default class gameMaster extends Phaser.Scene {
     } else {
       this.player.body.setVelocityX(0);
       this.player.anims.play("turn");
+    }
+
+    if (this.cursors.up.isDown && this.player.body.touching.down) {
+      this.player.body.setVelocityY(-170);
+      this.player.anims.play("jump", true);
+    }
+
+    if (this.keyA.isDown) {
+      this.mining("left");
+    }
+    if (this.keyD.isDown) {
+      this.mining("right");
+    }
+    if (this.keyS.isDown) {
+      this.mining("down");
+    }
+    if (this.keyW.isDown) {
+      this.mining("up");
     }
   }
 
@@ -156,23 +179,65 @@ export default class gameMaster extends Phaser.Scene {
     }
   }
 
-  async mining() {
-    if (this.player.x == 416 || this.player.x == 784) {
-      this.beak.clear(true, true);
-      this.beak.create(this.player.x + 2, this.player.y + 2, "beak");
-      this.beak.setOrigin(1, 1);
-      //this.beak.children.
-      //this.beak.setRotation(60);
-      //this.beak.angle(0);
-      //await this.delay(0.5);
-      //this.beak.angle(10);
-      /*for (let i = 0; i < 50; i++) {
-                //this.beak.angle(-10);
-                this.beak.setRotation(60);
-                await this.delay(0.5);
-                //this.beak.angle(10);
-                this.beak.setRotation(0);
-            }*/
+  mining(orientation) {
+    this.player.body.setVelocity(0);
+
+    if (orientation === "left") {
+      this.player.anims.play("mining", true);
+      this.player.flipX = true;
+      this.pf.children.iterate((e) => {
+        if (
+          this.player.x - e.x <= 48.4 &&
+          this.player.x - e.x >= 41.6 &&
+          e.y === this.player.y
+        ) {
+          e.disableBody(true, true);
+        }
+      });
+    }
+
+    if (orientation === "right") {
+      this.player.anims.play("mining", true);
+      this.player.flipX = false;
+      this.pf.children.iterate((e) => {
+        if (
+          e.x - this.player.x <= 48.4 &&
+          e.x - this.player.x >= 41.6 &&
+          e.y === this.player.y
+        ) {
+          e.disableBody(true, true);
+        }
+      });
+    }
+
+    if (orientation === "down") {
+      this.player.anims.play("miningDown", true);
+      this.pf.children.iterate((e) => {
+        /*if (
+          this.player.x - e.x + 45 <= 48.4 &&
+          this.player.x - e.x + 45 >= 41.6 &&
+          e.y === this.player.y + 45
+        ) {
+          e.disableBody(true, true);
+          console.log(e.y, this.y);
+        }*/
+        if (e.y === this.player.y + 45 && e.x === this.x) {
+          e.disableBody(true, true);
+        }
+      });
+    }
+
+    if (orientation === "up") {
+      this.player.anims.play("miningDown", true);
+      this.pf.children.iterate((e) => {
+        if (
+          this.player.x - e.x + 45 <= 48.4 &&
+          this.player.x - e.x + 45 >= 41.6 &&
+          e.y === this.player.y - 45
+        ) {
+          e.disableBody(true, true);
+        }
+      });
     }
   }
 }
