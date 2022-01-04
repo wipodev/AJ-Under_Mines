@@ -7,7 +7,7 @@ export default class gameMaster extends Phaser.Scene {
   }
 
   create() {
-    this.maps = new Maps(44, 14, this.skyline, 45, 100, 90);
+    this.maps = new Maps(44, 26, this.skyline, 45, 100, 90);
 
     //--------  fondo del juego  ----------------------------
     this.add.image(400, 300, "Sky");
@@ -39,9 +39,11 @@ export default class gameMaster extends Phaser.Scene {
     //----------  mapa del juego ----------------------------------
     this.pf = this.physics.add.staticGroup();
     this.maps.getMap.forEach((e) => {
-      this.pf.create(e.x, e.y, "atlas", e.block).setAngle(e.angle);
+      this.pf
+        .create(e.x, e.y, "atlas", e.block)
+        .setAngle(e.angle)
+        .setPipeline("Light2D");
     });
-
     //------------------------------------------------------------
 
     //---------------  jugador ---------------------------------------
@@ -99,8 +101,23 @@ export default class gameMaster extends Phaser.Scene {
     });
     //---------------------------------------------------------------
 
-    //------------ fisicas  -----------------------------------
+    //-------------  Linterna  ------------------------------------------
+    this.lights.enable().setAmbientColor(0x999999);
+    this.lantern = this.lights.addLight(
+      this.player.x,
+      this.player.y,
+      150,
+      0xffffff,
+      6
+    );
+    //----------------------------------------------------------------
+
+    //------------ fisicas y fisicas  -----------------------------------
+    this.cameras.main.setBounds(0, 0, 1950, 1150);
     this.physics.world.setBounds(0, 0, 1950, 1150);
+    this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
+    this.cameras.main.setViewport(0, 0, 1200, 600);
+    this.cameras.main.setRoundPixels(true);
 
     // coliciones
     this.physics.add.collider(this.player, this.pf, this.pepe, null, this);
@@ -110,6 +127,9 @@ export default class gameMaster extends Phaser.Scene {
   }
 
   update(time, delta) {
+    this.lantern.x = this.player.x;
+    this.lantern.y = this.player.y;
+
     if (this.cursors.left.isDown) {
       this.walking(-100, true);
     } else if (this.cursors.right.isDown) {
