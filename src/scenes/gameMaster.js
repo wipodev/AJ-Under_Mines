@@ -4,10 +4,17 @@ export default class gameMaster extends Phaser.Scene {
   constructor() {
     super("gameMaster");
     this.skyline = 10;
+    this.x = 0;
+    this.y = 0;
+    this.sizeBlock = 45;
+    this.sizeX = 180;
+    this.sizeY = 200;
+    this.scaleSprite = 0.225;
+    this.roominess = (this.sizeBlock - this.sizeX * this.scaleSprite) / 2;
   }
 
   create() {
-    this.maps = new Maps(44, 26, this.skyline, 45, 100, 90);
+    this.maps = new Maps(44, 26, this.skyline, this.sizeBlock, 100, 90);
 
     //--------  fondo del juego  ----------------------------
     this.add.image(400, 300, "Sky");
@@ -16,7 +23,7 @@ export default class gameMaster extends Phaser.Scene {
     for (let y = this.skyline; y < 26; y++) {
       for (let x = 0; x < 44; x++) {
         let tile = Math.round(Math.random() * 3);
-        let angle = Math.round(Math.random() * 3);
+        let angle = this.maps.getRandom(4, 90);
         if (y === this.skyline) {
           tile = "H1";
           angle = 0;
@@ -25,12 +32,10 @@ export default class gameMaster extends Phaser.Scene {
           if (tile === 1) tile = "B2";
           if (tile === 2) tile = "B3";
           if (tile === 3) tile = "B4";
-          if (angle === 0) angle = 0;
-          if (angle === 1) angle = 90;
-          if (angle === 2) angle = 180;
-          if (angle === 3) angle = 270;
         }
-        this.add.image(x * 45, y * 45, "atlas", tile).setAngle(angle);
+        this.add
+          .image(x * this.sizeBlock, y * this.sizeBlock, "atlas", tile)
+          .setAngle(angle);
       }
     }
 
@@ -47,11 +52,12 @@ export default class gameMaster extends Phaser.Scene {
     //------------------------------------------------------------
 
     //---------------  jugador ---------------------------------------
-    this.player = this.physics.add.sprite(945, 405, "miner").setScale(0.225);
+    this.player = this.physics.add.sprite(945, 405, "miner");
+    this.player.setScale(this.scaleSprite);
     this.player.setCollideWorldBounds(true);
 
     //ajusta los limites de un objeto o personaje
-    this.player.setSize(180, 200, true);
+    this.player.setSize(this.sizeX, this.sizeY, true);
 
     // animacion de jugador
     this.anims.create({
@@ -112,7 +118,7 @@ export default class gameMaster extends Phaser.Scene {
     );
     //----------------------------------------------------------------
 
-    //------------ fisicas y fisicas  -----------------------------------
+    //------------ camara y fisicas  -----------------------------------
     this.cameras.main.setBounds(0, 0, 1950, 1150);
     this.physics.world.setBounds(0, 0, 1950, 1150);
     this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
@@ -120,7 +126,13 @@ export default class gameMaster extends Phaser.Scene {
     this.cameras.main.setRoundPixels(true);
 
     // coliciones
-    this.physics.add.collider(this.player, this.pf, this.pepe, null, this);
+    this.physics.add.collider(
+      this.player,
+      this.pf,
+      this.colliderPF,
+      null,
+      this
+    );
 
     // evento de teclas
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -136,11 +148,38 @@ export default class gameMaster extends Phaser.Scene {
     this.lantern.y = this.player.y;
 
     if (this.cursors.left.isDown) {
-      this.walking(-100, true);
+      if (this.player.y === this.y && this.player.x > this.x) {
+        this.mining(
+          this.sizeBlock - this.roominess,
+          this.sizeBlock + this.roominess,
+          this.player.y,
+          "mining",
+          0,
+          true
+        );
+      } else {
+        this.walking(-100, true);
+      }
     } else if (this.cursors.right.isDown) {
-      this.walking(100, false);
+      if (this.player.y === this.y && this.player.x < this.x) {
+        this.mining(
+          this.sizeBlock - this.roominess,
+          this.sizeBlock + this.roominess,
+          this.player.y,
+          "mining",
+          this.sizeBlock * 2
+        );
+      } else {
+        this.walking(100, false);
+      }
     } else if (this.cursors.down.isDown) {
-      this.mining("down");
+      this.mining(
+        this.sizeBlock - this.roominess,
+        this.sizeBlock + this.roominess,
+        this.player.y + this.sizeBlock,
+        "miningDown",
+        this.sizeBlock
+      );
     } else {
       this.player.body.setVelocityX(0);
       this.player.anims.play("turn");
@@ -151,17 +190,14 @@ export default class gameMaster extends Phaser.Scene {
       this.player.anims.play("jump", true);
     }
 
-    if (this.keyA.isDown) {
-      this.mining("left");
-    }
-    if (this.keyD.isDown) {
-      this.mining("right");
-    }
-    if (this.keyS.isDown) {
-      this.mining("down");
-    }
     if (this.keyW.isDown) {
-      this.mining("up");
+      this.mining(
+        this.sizeBlock - this.roominess,
+        this.sizeBlock + this.roominess,
+        this.player.y - this.sizeBlock,
+        "mining",
+        this.sizeBlock
+      );
     }
   }
 
@@ -171,73 +207,26 @@ export default class gameMaster extends Phaser.Scene {
     this.player.anims.play("walk", true);
   }
 
-  pepe(player, pf) {
+  colliderPF(player, pf) {
     if (pf.x != this.x || pf.y != this.y) {
-      console.log(pf.x, pf.y);
       this.x = pf.x;
       this.y = pf.y;
+      //console.log(this.x, this.y);
     }
   }
 
-  mining(orientation) {
-    this.player.body.setVelocity(0);
-
-    if (orientation === "left") {
-      this.player.anims.play("mining", true);
-      this.player.flipX = true;
-      this.pf.children.iterate((e) => {
-        if (
-          this.player.x - e.x <= 48.4 &&
-          this.player.x - e.x >= 41.6 &&
-          e.y === this.player.y
-        ) {
-          e.disableBody(true, true);
-        }
-      });
-    }
-
-    if (orientation === "right") {
-      this.player.anims.play("mining", true);
-      this.player.flipX = false;
-      this.pf.children.iterate((e) => {
-        if (
-          e.x - this.player.x <= 48.4 &&
-          e.x - this.player.x >= 41.6 &&
-          e.y === this.player.y
-        ) {
-          e.disableBody(true, true);
-        }
-      });
-    }
-
-    if (orientation === "down") {
-      this.player.anims.play("miningDown", true);
-      this.pf.children.iterate((e) => {
-        /*if (
-          this.player.x - e.x + 45 <= 48.4 &&
-          this.player.x - e.x + 45 >= 41.6 &&
-          e.y === this.player.y + 45
-        ) {
-          e.disableBody(true, true);
-          console.log(e.y, this.y);
-        }*/
-        if (e.y === this.player.y + 45 && e.x === this.x) {
-          e.disableBody(true, true);
-        }
-      });
-    }
-
-    if (orientation === "up") {
-      this.player.anims.play("miningDown", true);
-      this.pf.children.iterate((e) => {
-        if (
-          this.player.x - e.x + 45 <= 48.4 &&
-          this.player.x - e.x + 45 >= 41.6 &&
-          e.y === this.player.y - 45
-        ) {
-          e.disableBody(true, true);
-        }
-      });
-    }
+  mining(min, max, y, animation, posi = 0, flip = false) {
+    this.player.anims.play(animation, true);
+    this.player.flipX = flip;
+    this.pf.children.iterate((e) => {
+      let playerPosi = this.player.x - e.x + posi;
+      if (
+        playerPosi.toFixed(2) >= min &&
+        playerPosi.toFixed(2) <= max &&
+        e.y === y
+      ) {
+        e.disableBody(true, true);
+      }
+    });
   }
 }
