@@ -10,7 +10,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "T0",
+      "filename": "E0",
       "frame": { "x": 45, "y": 0, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -19,7 +19,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "T1",
+      "filename": "E1",
       "frame": { "x": 90, "y": 0, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -28,7 +28,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "T2",
+      "filename": "E2",
       "frame": { "x": 135, "y": 0, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -37,7 +37,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "T3",
+      "filename": "E3",
       "frame": { "x": 180, "y": 0, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -46,7 +46,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "T4",
+      "filename": "E4",
       "frame": { "x": 225, "y": 0, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -118,7 +118,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "P0",
+      "filename": "R0",
       "frame": { "x": 45, "y": 90, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -127,7 +127,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "P1",
+      "filename": "R1",
       "frame": { "x": 90, "y": 90, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -136,7 +136,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "P2",
+      "filename": "R2",
       "frame": { "x": 135, "y": 90, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -145,7 +145,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "P3",
+      "filename": "R3",
       "frame": { "x": 180, "y": 90, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -154,7 +154,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "P4",
+      "filename": "R4",
       "frame": { "x": 225, "y": 90, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -163,7 +163,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "A0",
+      "filename": "W0",
       "frame": { "x": 0, "y": 135, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -172,7 +172,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "A1",
+      "filename": "W1",
       "frame": { "x": 45, "y": 135, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -181,7 +181,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "A2",
+      "filename": "W2",
       "frame": { "x": 90, "y": 135, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -190,7 +190,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "A3",
+      "filename": "W3",
       "frame": { "x": 135, "y": 135, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -199,7 +199,7 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "A4",
+      "filename": "W4",
       "frame": { "x": 180, "y": 135, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
@@ -208,8 +208,62 @@
       "pivot": { "x": 0.5, "y": 0.5 }
     },
     {
-      "filename": "A5",
+      "filename": "W5",
       "frame": { "x": 225, "y": 135, "w": 45, "h": 45 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 45 },
+      "sourceSize": { "w": 45, "h": 45 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "filename": "S0",
+      "frame": { "x": 0, "y": 180, "w": 45, "h": 45 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 45 },
+      "sourceSize": { "w": 45, "h": 45 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "filename": "S1",
+      "frame": { "x": 45, "y": 180, "w": 45, "h": 45 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 45 },
+      "sourceSize": { "w": 45, "h": 45 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "filename": "S2",
+      "frame": { "x": 90, "y": 180, "w": 45, "h": 45 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 45 },
+      "sourceSize": { "w": 45, "h": 45 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "filename": "S3",
+      "frame": { "x": 135, "y": 180, "w": 45, "h": 45 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 45 },
+      "sourceSize": { "w": 45, "h": 45 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "filename": "S4",
+      "frame": { "x": 180, "y": 180, "w": 45, "h": 45 },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 45 },
+      "sourceSize": { "w": 45, "h": 45 },
+      "pivot": { "x": 0.5, "y": 0.5 }
+    },
+    {
+      "filename": "S5",
+      "frame": { "x": 225, "y": 180, "w": 45, "h": 45 },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": { "x": 0, "y": 0, "w": 45, "h": 45 },
@@ -221,7 +275,7 @@
     "version": "1.0",
     "image": "tierra2.png",
     "format": "RGBA8888",
-    "size": { "w": 270, "h": 180 },
+    "size": { "w": 270, "h": 225 },
     "scale": "1"
   }
 }

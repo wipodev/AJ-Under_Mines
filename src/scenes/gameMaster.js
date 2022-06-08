@@ -1,9 +1,6 @@
-import Maps from "../components/maps.js";
-
-export default class gameMaster extends Phaser.Scene {
+export default class GameMaster extends Phaser.Scene {
   constructor() {
     super("gameMaster");
-    this.skyline = 10;
     this.x = 0;
     this.y = 0;
     this.sizeBlock = 45;
@@ -13,46 +10,36 @@ export default class gameMaster extends Phaser.Scene {
     this.roominess = (this.sizeBlock - this.sizeX * this.scaleSprite) / 2;
   }
 
+  init(data) {
+    this.maps = data.maps;
+  }
+
   create() {
-    this.maps = new Maps(44, 26, this.skyline, this.sizeBlock, 100, 90);
-
     //--------  fondo del juego  ----------------------------
-    this.add.image(400, 300, "Sky");
-    this.add.image(1200, 300, "Sky");
-    this.add.image(1600, 300, "Sky");
-    for (let y = this.skyline; y < 26; y++) {
-      for (let x = 0; x < 44; x++) {
-        let tile = Math.round(Math.random() * 3);
-        let angle = this.maps.getRandom(4, 90);
-        if (y === this.skyline) {
-          tile = "H1";
-          angle = 0;
-        } else {
-          if (tile === 0) tile = "B1";
-          if (tile === 1) tile = "B2";
-          if (tile === 2) tile = "B3";
-          if (tile === 3) tile = "B4";
-        }
+    this.maps.getBackground.forEach((e) => {
+      if (e.tile.substring(0, 1) !== "S") {
         this.add
-          .image(x * this.sizeBlock, y * this.sizeBlock, "atlas", tile)
-          .setAngle(angle);
+          .image(e.x, e.y, "atlas", e.tile)
+          .setAngle(e.angle)
+          .setPipeline("Light2D");
+      } else {
+        this.add.image(e.x, e.y, "atlas", e.tile).setAngle(e.angle);
       }
-    }
-
-    //------------------------------------------------------------
+    });
+    //-------------------------------------------------------
 
     //----------  mapa del juego ----------------------------------
     this.pf = this.physics.add.staticGroup();
     this.maps.getMap.forEach((e) => {
       this.pf
-        .create(e.x, e.y, "atlas", e.block)
+        .create(e.x, e.y, "atlas", e.tile)
         .setAngle(e.angle)
         .setPipeline("Light2D");
     });
     //------------------------------------------------------------
 
     //---------------  jugador ---------------------------------------
-    this.player = this.physics.add.sprite(945, 405, "miner");
+    this.player = this.physics.add.sprite(600, 180, "miner");
     this.player.setScale(this.scaleSprite);
     this.player.setCollideWorldBounds(true);
 
@@ -119,8 +106,8 @@ export default class gameMaster extends Phaser.Scene {
     //----------------------------------------------------------------
 
     //------------ camara y fisicas  -----------------------------------
-    this.cameras.main.setBounds(0, 0, 1950, 1150);
-    this.physics.world.setBounds(0, 0, 1950, 1150);
+    this.cameras.main.setBounds(0, 0, 1200, 1000);
+    this.physics.world.setBounds(0, 0, 1200, 600);
     this.cameras.main.startFollow(this.player, true, 0.05, 0.05);
     this.cameras.main.setViewport(0, 0, 1200, 600);
     this.cameras.main.setRoundPixels(true);
