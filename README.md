@@ -4,6 +4,8 @@
 
 # Under Mines.
 
+![screen](/screenshot/screen.png)
+
 Mining game with randomly generated map, using the Godot engine
 
 ## License
