@@ -30,5 +30,6 @@ export default class Bootloader extends Phaser.Scene {
       frameWidth: 200,
       frameHeight: 200,
     });
+    this.load.image("agua", "img/agua.png");
   }
 }

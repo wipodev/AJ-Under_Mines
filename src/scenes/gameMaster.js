@@ -38,6 +38,21 @@ export default class GameMaster extends Phaser.Scene {
     });
     //------------------------------------------------------------
 
+    //---------------- prueba de particulas ------------------------
+    this.a = this.physics.add.group();
+    for (let y = 0; y < 45; y++) {
+      for (let x = 158; x < 203; x++) {
+        this.a.create(x, y, "agua");
+      }
+    }
+
+    // fisicas
+    //this.physics.add.collider(this.a, this.pf);
+    this.physics.add.collider(this.a, this.pf, this.pepe, null, this);
+    console.log(this.a.children.entries);
+
+    //---------------------------------------------------------------
+
     //---------------  jugador ---------------------------------------
     this.player = this.physics.add.sprite(600, 180, "miner");
     this.player.setScale(this.scaleSprite);
@@ -186,6 +201,15 @@ export default class GameMaster extends Phaser.Scene {
         this.sizeBlock
       );
     }
+    //------------ prueba particulas -------------
+    this.a.children.iterate((e) => {
+      if (e.collided === false) {
+        let newPos = this.moveTo(e);
+        e.x = newPos[0];
+        e.y = newPos[1];
+      }
+    });
+    //--------------------------------------------
   }
 
   walking(velocity, flip) {
@@ -215,5 +239,54 @@ export default class GameMaster extends Phaser.Scene {
         e.disableBody(true, true);
       }
     });
+  }
+
+  //---------------- prueba particula ----------------------
+  pepe(a) {
+    a.collided = true;
+  }
+
+  moveTo(e) {
+    //const grid = this.children.list;
+    const grid = this.a.children.entries;
+    let c = Math.random() > 0.5;
+    const pos = {
+      here: [e.x, e.y],
+      up: [e.x, e.y - 1],
+      down: [e.x, e.y + 1],
+      left: [e.x - 1, e.y],
+      right: [e.x + 1, e.y],
+      upL: [e.x - 1, e.y - 1],
+      upR: [e.x + 1, e.y - 1],
+      downL: [e.x - 1, e.y + 1],
+      downR: [e.x + 1, e.y + 1],
+    };
+
+    let Down = grid.find((g) =>
+      g.x == pos.down[0] && g.y == pos.down[1] ? true : false
+    );
+    let DownL = grid.find((g) =>
+      g.x == pos.downL[0] && g.y == pos.downL[1] ? true : false
+    );
+    let DownR = grid.find((g) =>
+      g.x == pos.downR[0] && g.y == pos.downR[1] ? true : false
+    );
+    let Left = grid.find((g) =>
+      g.x == pos.left[0] && g.y == pos.left[1] ? true : false
+    );
+    let Right = grid.find((g) =>
+      g.x == pos.right[0] && g.y == pos.right[1] ? true : false
+    );
+
+    if (Down === undefined) {
+      return pos.down;
+    }
+    if ((c ? DownL : DownR) === undefined) {
+      return c ? pos.downL : pos.downR;
+    }
+    if ((c ? Left : Right) === undefined) {
+      return c ? pos.left : pos.right;
+    }
+    return pos.here;
   }
 }
