@@ -38,13 +38,13 @@ func generate_map_tiles() ->void:
 	if !conf.check_map():
 		for y in height:
 			for x in width:
-				if y < sky_line:
-					maps.append({x = x, y = y, tile = sky_tile, flipx = false, flipy = false, rote = false})
+				#if y < sky_line:
+					#maps.append({x = x, y = y, tile = sky_tile, flipx = false, flipy = false, rote = false})
 				if y == sky_line:
 					maps.append({x = x, y = y, tile = horizon_tile, flipx = false, flipy = false, rote = false})
 				if y > sky_line:
 					create_tile(x, y)
-		conf.save_map(maps)
+		#conf.save_map(maps)
 	else:
 		maps = conf.load_map()
 	
@@ -110,9 +110,15 @@ func random_shape(x, y, group):
 				if x_t >= width:
 					x_t = x_t - width
 					if !tile_exist(x_t, y_t):
-						maps.append({x = x_t, y = y_t, tile = tile, flipx = angle[0], flipy = angle[1], rote = angle[2]})
+						if group == "Water":
+							$TileMap/LiquidSim.set_liquid(x_t, y_t, 1.0);
+						else:
+							maps.append({x = x_t, y = y_t, tile = tile, flipx = angle[0], flipy = angle[1], rote = angle[2]})
 				if !tile_exist(x_t, y_t):
-					maps.append({x = x_t, y = y_t, tile = tile, flipx = angle[0], flipy = angle[1], rote = angle[2]})
+					if group == "Water":
+						$TileMap/LiquidSim.set_liquid(x_t, y_t, 1.0);
+					else:
+						maps.append({x = x_t, y = y_t, tile = tile, flipx = angle[0], flipy = angle[1], rote = angle[2]})
 
 func random_group():
 	var r = randi() % 100 + 1
@@ -126,3 +132,9 @@ func tile_exist(x, y):
 			if m.x == x && m.y == y:
 				return true
 	return false
+
+func _input(event):
+	if event is InputEventMouseButton:
+		# Mouse in viewport coordinates
+		var wpos = tiles.world_to_map(tiles.get_global_mouse_position())
+		$TileMap/LiquidSim.add_liquid(wpos.x, wpos.y, 1.0)
