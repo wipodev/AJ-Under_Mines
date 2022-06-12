@@ -1,140 +1,98 @@
 extends Node
 
-onready var tiles: TileMap = get_node("TileMap")
-var conf = preload("res://scripts/config.gd")
+#------------------------------------------------º
+# SCRIPT PARA LA GENERACION Y CONTROL DE MAPAS   |
+#------------------------------------------------º
 
-export(float) var tile_size = 45.0
-export(int) var shapes_amount = 5
-export(int) var sky_line = 10
-export(int) var sky_tile = 23
-export(int) var horizon_tile = 20
-export(int) var water_tile = 17
-export(int) var figure_tile_start = 10
-export(int) var figure_tile_end = 14
-export(int) var probability = 10
-export(int) var width = 43
-export(int) var height = 24
+# Inspector variables.
 
-var figures = {}
-var maps: Array
-var percTiles: Array
-var percGroup: Array
+export (int, 40, 400) var map_width = 70;
+export (int, 20, 300) var map_height = 50;
+
+# Diccionarios (lo que serian objetor en javascript.
+
+var available_tiles = {
+	"earth": 0,
+	"rock": 10,
+	"base": 5,
+	"water": 18
+};
+
+# Resources variables.
+
+var terrain_map: TileMap = null; # tilemap que se asocia co los tiles deceados.
+var perlin_noise: OpenSimplexNoise = null; # algoritmo que genera el ruido.
 
 func _ready() -> void:
-	randomize()
-	conf = conf.new()
-	percTiles = conf.percTiles
-	percGroup = conf.percGroup
-	figures = conf.figures
-	generate_map_tiles()
-	load_map()
-
-func load_map():
-	for m in maps:
-		tiles.set_cell(m.x, m.y, m.tile, m.flipx, m.flipy, m.rote)
-
-func generate_map_tiles() ->void:
-	# verificamos si ya hay un mapa creado.
-	if !conf.check_map():
-		for y in height:
-			for x in width:
-				#if y < sky_line:
-					#maps.append({x = x, y = y, tile = sky_tile, flipx = false, flipy = false, rote = false})
-				if y == sky_line:
-					maps.append({x = x, y = y, tile = horizon_tile, flipx = false, flipy = false, rote = false})
-				if y > sky_line:
-					create_tile(x, y)
-		#conf.save_map(maps)
-	else:
-		maps = conf.load_map()
+	randomize(); # Se encarga de que el script pueda funsionar con valores aleatorios.
 	
-func update_tile_probability(y):
-	var high = round(float(height - sky_line) / 5)
-	var top = y - sky_line
-	var reduce = probability
-	if top == high:
-		percTiles[0].perc -= reduce
-	if top == high*2:
-		percTiles[0].perc -= reduce
-		percTiles[1].perc -= reduce
-	if top == high*3:
-		percTiles[0].perc -= reduce
-		percTiles[1].perc -= reduce
-		percTiles[2].perc -= reduce
-	if top == high*4:
-		percTiles[0].perc -= reduce
-		percTiles[1].perc -= reduce
-		percTiles[2].perc -= reduce
-		percTiles[3].perc -= reduce
+	set_process(false); # cancelamos los procesos para que no ocupen espacio en la memoria.
 	
-func reset_tile_probability():
-	var reduce = probability
-	percTiles[0].perc += reduce * 4
-	percTiles[1].perc += reduce * 3
-	percTiles[2].perc += reduce * 2
-	percTiles[3].perc += reduce
+	configurate_perlin_noise(); # funsion para configurar las propiedades de OpenSimplexNoise.
+	configurate_tilemaps(); # funsion para cargar el tilemap y añadirlo a la escena.
+	generate_terrain(); # funsion que usa los metodos de OpenSimplexNoise para generar el mapa.
 
-func generate_angle_random() -> Array:
-	var new_angle = randi() % 2 > 0
-	var new_flipx = randi() % 2 > 0
-	var new_flipy = randi() % 2 > 0
-	return [new_flipx, new_flipy, new_angle]
 
-func create_tile(x, y):
-	var group = random_group()
-	var angle: Array = generate_angle_random()
-	var r = randi() % 100 + 1
-	if group == "Earth":
-		for perc_tile in percTiles:
-			if r <= perc_tile.perc:
-				if !tile_exist(x, y):
-					maps.append({x = x, y = y, tile = perc_tile.id, flipx = angle[0], flipy = angle[1], rote = angle[2]})
-					break
-	else:
-		random_shape(x, y, group)
-	update_tile_probability(y)
+func configurate_perlin_noise() -> void:
+	perlin_noise = OpenSimplexNoise.new(); # Se crea el nuevo recurso (no se añade como hijo a la escena).
+	perlin_noise.seed = randi(); # Se le da una "semilla" aleatoria. se puede guardar este valor si se quiere generar el mismo mapa.
+	perlin_noise.octaves = 4;
+	perlin_noise.period = 25;
+	perlin_noise.lacunarity = 1.5;
+	perlin_noise.persistence = 2;
 
-func random_shape(x, y, group):
-	var r_figure = figures[group][randi() % figures[group].size()]
-	var tile: int
-	for rf in r_figure:
-		for h in rf.h / tile_size:
-			for w in rf.w / tile_size:
-				if group == "Water":
-					tile = water_tile
-				else:
-					tile = int(rand_range(figure_tile_start, figure_tile_end))
-				var angle: Array = generate_angle_random()
-				var x_t = x + rf.x + w
-				var y_t = y + rf.y + h
-				if x_t >= width:
-					x_t = x_t - width
-					if !tile_exist(x_t, y_t):
-						if group == "Water":
-							$TileMap/LiquidSim.set_liquid(x_t, y_t, 1.0);
-						else:
-							maps.append({x = x_t, y = y_t, tile = tile, flipx = angle[0], flipy = angle[1], rote = angle[2]})
-				if !tile_exist(x_t, y_t):
-					if group == "Water":
-						$TileMap/LiquidSim.set_liquid(x_t, y_t, 1.0);
-					else:
-						maps.append({x = x_t, y = y_t, tile = tile, flipx = angle[0], flipy = angle[1], rote = angle[2]})
 
-func random_group():
-	var r = randi() % 100 + 1
-	for p_group in percGroup:
-		if r <= p_group.perc:
-			return p_group.group
-			
-func tile_exist(x, y):
-	if maps.size() != 0:
-		for m in maps:
-			if m.x == x && m.y == y:
-				return true
-	return false
+func configurate_tilemaps() -> void:
+	if terrain_map != null:
+		return
+	terrain_map = load("res://scenes/TileMap.tscn").instance(); # nueva instancia de la escena de terreno tilemap (la escena donde esta el tileSet)
+	add_child(terrain_map); # se añade como hijo de este nodo al tilemap resien instanciado.
 
-func _input(event):
-	if event is InputEventMouseButton:
-		# Mouse in viewport coordinates
-		var wpos = tiles.world_to_map(tiles.get_global_mouse_position())
-		$TileMap/LiquidSim.add_liquid(wpos.x, wpos.y, 1.0)
+
+func generate_terrain() -> void:
+	terrain_map.clear(); # se limpian todos los tiles creados antes.
+	generate_perimeter(); # esta funsion se encarga de generar los limites del mapa.
+	
+	for y in map_height: # este bucle recorre las celdas.
+		for x in map_width:
+			var random: float = perlin_noise.get_noise_2d(float(x), float(y)); # obtenemos numero aleatorio segun coordenadas y semilla.
+			terrain_map.set_cellv(Vector2(x,y), get_tile(random)); # aqui agregamos el nuevo tile a la celda indicada.
+
+
+func generate_perimeter() -> void:
+	for x in [-1, map_width]:
+		for y in map_height:
+			terrain_map.set_cellv(Vector2(x,y),6)
+	
+	for y in [-1, map_height]:
+		for x in map_width + 1:
+			terrain_map.set_cellv(Vector2(x,y),6)
+
+
+func get_tile(noise: float) -> int:
+	if noise < 0.0:
+		if noise < -0.3:
+			return available_tiles.water
+		return available_tiles.base
+	
+	if noise < 0.1:
+		if noise < 0.03:
+			available_tiles.rock = 12
+			return available_tiles.rock
+		if noise < 0.05:
+			available_tiles.rock = 13
+			return available_tiles.rock
+	
+	if noise < 0.7:
+		if noise < 0.2:
+			available_tiles.earth = 0
+			return available_tiles.earth
+		available_tiles.earth = 3
+		return available_tiles.earth
+	
+	return available_tiles.earth
+
+func _input(_event) -> void:
+	if Input.is_action_just_pressed("ui_accept"): # cuando se presione la tecla "ENTER"
+		configurate_perlin_noise()                # generamos un nuevo mundo.
+		generate_terrain()
